@@ -6,7 +6,7 @@
 #define NUM_ALPHA 26
 
 int comp(const void *s, const void *t) {
-    return strcmp(*(char**)s, *(char**) t);    /* 猔種硂柑 *(char**) ノ猭 */
+    return strcmp(*(char**)s, *(char**) t);    /* 注意char的用法 */
 }
 
 /* the last char of s is not MARKER */
@@ -20,15 +20,15 @@ char* bwtEncode(char *s, const int n) {
         exit(1);
     }
     for (i = 0; i < n; i++) {
-        if ((M[i] = (char*) malloc(sizeof(char) * (i + 2))) == NULL) {   /* 惠玂秨繷夹癘才ê场だ才﹃硂妓羆竊丁 */
+        if ((M[i] = (char*) malloc(sizeof(char) * (i + 2))) == NULL) {   /* 只須保存開頭到標記的那一部份字母串，這樣總共可以省約一半的空間 */
             fputs("Error: out of space!\n", stderr);
             exit(1);       
         }
         for (j = 0; j < i + 1; j++)
-            M[i][j] = s[n - 1 - i + j];   /* 硂ń才﹃⊿Τ纗 MARKER */
+            M[i][j] = s[n - 1 - i + j];   /* 這裡的字母串沒有存MARKER */
         M[i][i + 1] = '\0';
     }
-    qsort(M, n, sizeof(M[0]), comp);   /*癸臂锣才﹃逼 */
+    qsort(M, n, sizeof(M[0]), comp);   /* 對旋轉後的多個字母串排列 */
     for (i = 0, L[0] = s[n - 1]; i < n; i++) {
         if ((l = strlen(M[i])) < n)
             L[i + 1] = s[n - 1 - l];
@@ -53,16 +53,16 @@ char* bwtDecode(char *L, const int n) {
         fputs("Error: out of space!\n", stderr);
         exit(1);        
     }
-    for (i = 0; i < n; i++) {  /* Lい–销才计 */
+    for (i = 0; i < n; i++) {  /* L列中每種字母的個數 */
         if (L[i] == MARKER) 
             a[0]++;
         else
             a[L[i] - 'a' + 1]++;
     }
-    for (i = 1; i < NUM_ALPHA + 1; i++) {   /* Fい逼–销才玡ㄤ才计 */
+    for (i = 1; i < NUM_ALPHA + 1; i++) {   /* F列中排在每種字母前面的其他字母的個數 */
         a[i] += a[i - 1];
     }
-    for (i = 0; i < n; i++) {    /* Lい–才铬锣Fい竚 */
+    for (i = 0; i < n; i++) {    /* L列中每個字母跳轉到F列中的位置 */
         if (L[i] == MARKER)
             b[i] = 0;
         else
